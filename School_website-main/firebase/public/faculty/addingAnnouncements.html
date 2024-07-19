@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Announcements</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-image: url('bgsch.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  background-color: #3498db;
+  color: #fff;
+  padding: 20px;
+}
+
+.class-name {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="text"],
+textarea,
+input[type="date"],
+input[type="file"],
+input[type="url"] {
+  display: block;
+  margin-top: 5px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.images-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.images-section img {
+  width: 150px;
+  height: auto;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+.success-message {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <div  >
+        <img src="../images/logo.jpeg" id=logo alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+    </div>
+  </header>
+  
+  <div class="container">
+
+    <div class="class-name">Announcements Updates</div>
+    <div id="success"></div>
+    <div class="upload-section">
+      <form >
+        <label for="class">About : </label>
+        <input type="text" id="about" required >
+        <br> <br>
+        <label for="subject">Description : </label> <br><br>
+        <input type="text" id="description" style="width: 60%; height: 100px;" required>
+        <br><br>
+        <div style="display: flex; gap: 50px;" >
+            <div>
+                <label for="pdfFile">Any PDF to upload:</label>
+                <input type="file" name="pdfFile" id="pdfdoc" style="width:350px">
+            </div>
+            <div>
+                <label for="link">Any Link to Associate:</label>
+                <br>
+                <input type="url" name="link" id="link" style="height: 38px; width: 350px;" >
+            </div>
+        </div>
+        <br> <br>
+        <label for="deadline">Deadline: </label>
+        <input type="date" id="deadline" pattern="\d{2}-\d{2}-\d{4}" placeholder="dd-mm-yyyy" required>
+        <br> <br>
+        <input type="submit" value="Upload" id="submit" >
+      </form>
+    </div>
+
+    <div class="study-links">
+      <a href="https://www.example.com">Study Link 1</a><br>
+      <a href="https://www.example.com">Study Link 2</a>
+    </div>
+
+    <div class="images-section">
+      <img src="sch1.jpg" alt="Image 1">
+      <img src="sch2.jpg" alt="Image 2">
+      <img src="sch3.jpg" alt="Image 3">
+      <img src="sch4.jpg" alt="Image 4">
+    </div>
+  </div>
+  <script type="module" >
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+    authDomain: "school-website-ddd48.firebaseapp.com",
+    databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+    projectId: "school-website-ddd48",
+    storageBucket: "school-website-ddd48.appspot.com",
+    messagingSenderId: "1007933429374",
+    appId: "1:1007933429374:web:14840411aff249e0786a2f",
+    measurementId: "G-55R6D0MHYM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+  import { getStorage, uploadBytes,ref as storageRef ,getDownloadURL} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  
+  const db = getDatabase();
+  const storage = getStorage();
+
+    var submitbtn = document.querySelector("#submit");
+
+    async function uploaddoc(event){
+      event.preventDefault();
+
+      var about = document.getElementById("about").value;
+      var description = document.getElementById("description").value;
+      var pdfdoc = document.getElementById('pdfdoc');
+      var links = document.getElementById('link').value;
+      var deadline = document.getElementById('deadline').value;
+      
+      const pdf = pdfdoc.files[0];
+
+      const date = new Date();
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); 
+      const year = date.getFullYear();
+
+      const formattedDate = `${day}-${month}-${year}`;
+
+      if(pdf){
+        const fileSize = pdf.size;
+        const maxSize = 10*1024*1024;
+        if (fileSize > maxSize) {
+            alert('The file size exceeds the maximum limit of 10MB. Please choose a smaller photo.');
+            return;
+        } 
+        const fileName = pdf.name;
+        const fileNamea = fileName.replace(/\.[^/.]+$/, "");
+        const pdfRef = storageRef(storage, `Announcements/Documents`);
+        await uploadBytes(pdfRef,pdf);
+        var pdfURL = await getDownloadURL(pdfRef);
+        alert("PDF uploaded to database");
+      }
+      else{
+        var pdfURL = "";
+      }
+      if(links){
+        var string = '"<a href="'+links+'">Click here</a>"';
+      }
+      else{
+        var string = "";
+      }
+      set(ref(db, `Announcements/${about}`),{
+        About : about,
+        description : description,
+        pdfURL : pdfURL,
+        Links : string,
+        DeadLine : deadline,
+        CurDate : formattedDate
+      }
+      )
+      .then(()=>{
+        var elem = document.getElementById("success");
+        elem.innerHTML=`<div class="success-message">&#10004;  Data added successfully</div>`;
+      })
+      .catch((error)=>{
+        alert("Error: " + error.message);
+      });
+    }
+    submitbtn.addEventListener('click',uploaddoc);
+  </script>
+</body>
+</html>

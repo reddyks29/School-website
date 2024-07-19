@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      width: 300px;
+      margin: 100px auto;
+      padding: 40px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    
+    .container h2 {
+      text-align: center;
+    }
+    
+    .container input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    .container input[type="password"]{
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    .container .button-container {
+      text-align: center;
+    }
+    .container button[type="submit"]{
+      width: 30%;
+      padding: 10px;
+      border-radius: 3px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    .container .button-container button {
+      padding: 10px;
+      border-radius: 3px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div style="background-color: antiquewhite; height: auto; font-size: x-large; margin: 10px; border: 3px solid green; padding: 15px;" >
+    <img src="../images/logo.jpeg" id="logo" alt="Logo image" style="margin-left: 10px; height: 50px; width: auto; vertical-align: middle; "/> <B style="vertical-align: middle;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+</div>
+  <div class="container">
+    <h2>Signup Form</h2>
+    <form id="signupForm" onsubmit="submitForm(event)">
+      <input type="text" id="name" placeholder="Name">
+      <input type="text" id="email" placeholder="Email">
+      <input type="password" id="pass1" placeholder="Enter password">
+      <input type="password" id="pass2" placeholder="Confirm password">
+      <button type="submit" id="signin">Signup</button>
+    </form>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+      authDomain: "school-website-ddd48.firebaseapp.com",
+      databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+      projectId: "school-website-ddd48",
+      storageBucket: "school-website-ddd48.appspot.com",
+      messagingSenderId: "1007933429374",
+      appId: "1:1007933429374:web:14840411aff249e0786a2f",
+      measurementId: "G-55R6D0MHYM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const submitbtn = document.querySelector("#signin");
+
+    
+
+    async function verify(event){
+      event.preventDefault();
+      const email = document.querySelector("#email").value;
+      const name = document.querySelector("#name").value;
+      const password1 = document.querySelector("#pass1").value;
+      const password2 = document.querySelector("#pass2").value;
+      if(password1 == password2){
+        createUserWithEmailAndPassword(auth, email, password1)
+      .then((userCredential) => {
+        alert("added to email");
+        set(ref(db, "Users/" + name.value), {
+          Name: name,
+          email: email,
+          password: password1
+        })
+        .then(() => {
+          alert("Data added successfully");
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+      }
+      else {
+        alert("Passwords do not match");
+      }
+    }
+    submitbtn.addEventListener('click',verify);
+  </script>
+</body>
+</html>

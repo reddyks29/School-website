@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      width: 300px;
+      margin: 100px auto;
+      padding: 40px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    
+    .container h2 {
+      text-align: center;
+    }
+    
+    .container input[type="text"],
+    .container input[type="password"] {
+      width: 93%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    
+    .container button[type="submit"]{
+      width: 30%;
+      padding: 10px;
+      border-radius: 3px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    
+    #buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+    <div style="background-color: antiquewhite; height: auto; font-size: x-large; margin: 10px; border: 3px solid green; padding: 15px;" >
+        <img src="../images/logo.jpeg" id="logo" alt="Logo image" style="margin-left: 10px; height: 50px; width: auto; vertical-align: middle; "/> <B style="vertical-align: middle;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+    </div>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm" onsubmit="login(event)">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <div id="buttons">
+        <button type="submit" id="login" value="Login">Log In</button>
+      </div>
+    </form>
+  </div>
+
+  <script type="module" >
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+      authDomain: "school-website-ddd48.firebaseapp.com",
+      databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+      projectId: "school-website-ddd48",
+      storageBucket: "school-website-ddd48.appspot.com",
+      messagingSenderId: "1007933429374",
+      appId: "1:1007933429374:web:14840411aff249e0786a2f",
+      measurementId: "G-55R6D0MHYM"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+
+    const logina = document.querySelector('#login');
+    function login(event) {
+      event.preventDefault();
+
+      var email = document.querySelector('#username').value;
+      var pass = document.querySelector('#password').value;
+      signInWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => { 
+        window.location.href = "admin-menu.html";
+      })
+      .catch((error) => {
+        alert(error.code + error.message);
+      });
+
+    }
+    logina.addEventListener('click',login);
+  </script>
+</body>
+</html>

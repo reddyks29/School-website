@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>School Webpage</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  background-color: #3498db;
+  color: #fff;
+  padding: 20px;
+}
+
+.class-name {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+select,
+input[type="file"],
+input[type="submit"] {
+  display: block;
+  margin-top: 5px;
+  width: 100%;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.study-links {
+  margin-bottom: 20px;
+}
+
+.study-link a {
+  display: block;
+  margin-bottom: 5px;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+.images-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.images-section img {
+  width: 150px;
+  height: auto;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+.success-message {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div  >
+        <img src="../images/logo.jpeg" id=logo alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="class-name">Study Materilas Upload</div>
+    <div id="success"></div>
+    <div class="upload-section">
+      <form >
+        <label for="class">Class: </label>
+        <select name="class" id="class">
+          <option value="-------">----</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          </select>
+          <br>
+        <label for="subject">Subject: </label>
+        <select name="subject" id="subject">
+          <option value="-------">----</option>
+          <option value="kannada">Kannada</option>
+          <option value="english">English</option>
+          <option value="math">Maths</option>
+          <option value="science">Science</option>
+          <option value="social">Social Science</option>
+          <option value="hindi">Hindi</option>
+        </select>
+        <br>
+        <label for="pdfFile">Upload Notes PDF:</label>
+        <input type="file" name="pdfFile" id="pdfdoc" >
+        <br>
+        <input type="submit" value="Upload" id="submit" >
+      </form>
+    </div>
+
+    <div class="study-links">
+      <a href="https://www.example.com">Study Link 1</a><br>
+      <a href="https://www.example.com">Study Link 2</a>
+    </div>
+
+    <div class="images-section">
+      <img src="sch1.jpg" alt="Image 1">
+      <img src="sch2.jpg" alt="Image 2">
+      <img src="sch3.jpg" alt="Image 3">
+      <img src="sch4.jpg" alt="Image 4">
+    </div>
+  </div>
+  
+  <script type="module" >
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+    authDomain: "school-website-ddd48.firebaseapp.com",
+    databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+    projectId: "school-website-ddd48",
+    storageBucket: "school-website-ddd48.appspot.com",
+    messagingSenderId: "1007933429374",
+    appId: "1:1007933429374:web:14840411aff249e0786a2f",
+    measurementId: "G-55R6D0MHYM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+  import { getStorage, uploadBytes,ref as storageRef ,getDownloadURL} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  
+  const db = getDatabase();
+  const storage = getStorage();
+    
+
+    var submitbtn = document.querySelector("#submit");
+
+    async function uploaddoc(event){
+      event.preventDefault();
+
+      var standard = document.getElementById("class").value;
+      var subject = document.getElementById("subject").value;
+      var pdfdoc = document.getElementById('pdfdoc');
+
+       
+
+      const pdf = pdfdoc.files[0];
+      const fileSize = pdf.size;
+      const maxSize = 10*1024*1024;
+      if (fileSize > maxSize) {
+        alert('The file size exceeds the maximum limit of 10MB. Please choose a smaller photo.');
+        return;
+      }
+
+      const fileName = pdf.name;
+      const fileNamea = fileName.replace(/\.[^/.]+$/, "");
+      const pdfRef = storageRef(storage, `materials/${standard}/${subject}/${fileNamea}`);
+      await uploadBytes(pdfRef,pdf);
+
+      const pdfURL = await getDownloadURL(pdfRef);
+
+      alert("PDF uploaded to database");
+
+      set(ref(db, `materials/${standard}/${subject}/${fileNamea}`),{
+        document_name : pdf.name,
+        docURL : pdfURL
+      }
+      )
+      .then(()=>{
+        var elem = document.getElementById("success");
+        elem.innerHTML=`<div class="success-message">&#10004;  Data added successfully</div>`;
+      })
+      .catch((error)=>{
+        alert("Error: " + error.message);
+      });
+    }
+    submitbtn.addEventListener('click',uploaddoc);
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Display</title>
+  <style>
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #youtube {
+      width: 560px;
+      height: 315px;
+      margin-top: 20px;
+    }
+  </style>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  background-color: #3498db;
+  color: #fff;
+  padding: 20px;
+}
+
+.class-name {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+select,
+input[type="text"] {
+  display: block;
+  margin-top: 5px;
+  width: 100%;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+button {
+  display: block;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#youtube {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+input[type="submit"] {
+  display: block;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.study-links {
+  margin-bottom: 20px;
+}
+
+.study-link a {
+  display: block;
+  margin-bottom: 5px;
+  color: #0000FF;
+  text-decoration: none;
+}
+
+.images-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.images-section img {
+  width: 150px;
+  height: auto;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+</style>
+</head>
+<body>
+    <header>
+        <div>
+            <img src="../images/logo.jpeg" id="logo" alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+        </div>
+    </header>
+    <div class="container">
+      <div id="success"></div>
+        <div class="class-name">Youtube Video Upload</div>
+        
+        <div class="upload-section">
+            <label for="class">Class:</label>
+            <select name="class" id="class">
+              <option value="-------">----</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+            <br>
+            <label for="subject">Subject:</label>
+            <select name="subject" id="subject">
+              <option value="-------">----</option>
+              <option value="kannada">Kannada</option>
+              <option value="english">English</option>
+              <option value="math">Maths</option>
+              <option value="science">Science</option>
+              <option value="social">Social Science</option>
+              <option value="hindi">Hindi</option>
+            </select>
+            <br>
+            <label for="name">Name:</label> <br>
+            <input type="text" style="margin-top: 4px;" id="name">
+        </div>
+        <div class="container">
+            <label for="youtubeLink">YouTube Link:</label>
+            <input type="text" id="youtubeLink" placeholder="Enter YouTube link">
+            <button onclick="displayYouTube()">Display Video</button>
+        <div id="youtube" style="margin-top: 20px; margin-bottom: 20px;" ></div>
+        <input type="submit" value="Upload" id="submit">
+        <div class="study-links">
+            <a href="https://www.example.com">Study Link 1</a><br>
+            <a href="https://www.example.com">Study Link 2</a>
+          </div>
+          <div class="images-section">
+            <img src="" alt="Image 1">
+            <img src="" alt="Image 2">
+            <img src="" alt="Image 3">
+            <img src="" alt="Image 4">
+          </div>
+        </div>
+  </div>
+
+
+  <script>
+    var videoId;
+    function displayYouTube() {
+      var youtubeLink = document.getElementById("youtubeLink").value;
+      var youtubeFrame = document.getElementById("youtube");
+      videoId = extractVideoId(youtubeLink);
+      if (videoId) {
+        youtubeFrame.innerHTML = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      } else {
+        youtubeFrame.innerHTML = '<p>Please enter a valid YouTube link.</p>';
+      }
+    }
+
+    function extractVideoId(link) {
+      var videoId = "";
+      var patterns = [
+        /youtube\.com\/watch\?v=([^&]+)/,
+        /youtube\.com\/embed\/([^&]+)/,
+        /youtu.be\/([^&]+)/,
+        /youtube\.com\/v\/([^&]+)/
+      ];
+
+      for (var i = 0; i < patterns.length; i++) {
+        var match = link.match(patterns[i]);
+        if (match && match[1]) {
+          videoId = match[1];
+          break;
+        }
+      }
+
+      return videoId;
+    }
+  </script>
+  <script type="module" >
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+        authDomain: "school-website-ddd48.firebaseapp.com",
+        databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+        projectId: "school-website-ddd48",
+        storageBucket: "school-website-ddd48.appspot.com",
+        messagingSenderId: "1007933429374",
+        appId: "1:1007933429374:web:14840411aff249e0786a2f",
+        measurementId: "G-55R6D0MHYM"
+    };
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    const db = getDatabase();
+
+    var submitbtnn = document.getElementById("submit");
+
+    async function insertData(event){
+        event.preventDefault();
+        var standard = document.getElementById("class").value;
+        var subject = document.getElementById("subject").value;
+        var name = document.getElementById("name").value;
+
+        console.log(standard);
+        console.log(subject);
+
+        set(ref(db, `YouTubeLinks/${standard}/${subject}/${name}/`),{
+        Name : name,
+        Link : "https://www.youtube.com/embed/"+videoId
+      }
+      )
+      .then(()=>{
+        var elem = document.getElementById("success");
+        elem.innerHTML=`<div class="success-message">&#10004;  Data added successfully</div>`;
+      })
+      .catch((error)=>{
+        alert("Error: " + error.message);
+      });
+    }
+    submitbtnn.addEventListener('click',insertData);
+    
+  </script>
+</body>
+</html>

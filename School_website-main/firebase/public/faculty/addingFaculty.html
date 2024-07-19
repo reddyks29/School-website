@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty update</title>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .faculty-form {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .faculty-form h2 {
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .faculty-form label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .faculty-form input[type="text"],
+    .faculty-form textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .faculty-form input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .faculty-form input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    .faculty-form img {
+      max-width: 200px;
+      max-height: 200px;
+      margin-bottom: 10px;
+    }
+    #submit{
+      background-color: green;
+      color: #fff;
+    }
+    header {
+  text-align: center;
+  background-color: #3498db;
+  color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.success-message {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+  </style>
+<body>
+  <header>
+    <div  >
+        <img src="../images/logo.jpeg" id=logo alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADANAHAALI CROSS</B>
+    </div>
+  </header>
+  <div class="faculty-form">
+    <h2>Upload Faculty Details</h2>
+    <form id="faculty-upload-form">
+      <div id="success"></div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" name="photo" required accept="image/*">
+
+      <label for="department">Department:</label>
+      <input type="text" id="department" name="department" required>
+
+      <label for="experience">Teaching Experience:</label>
+      <input type="text" id="experience" name="experience" required>
+
+      <label for="designation">Designation:</label>
+      <textarea id="designation" name="designation" required></textarea>
+
+      <label for="contact">Contact:</label>
+      <input type="text" id="contact" name="contact" required>
+
+      <label for="Desc">Description:</label>
+      <input type="text" id="desc" name="desc" style="height: 100px;"  required >
+
+      <label for="Doj">Date of Join:</label>
+      <input type="date" id="doj" name="doj" style="width: 300px; height: 30px; " required>
+
+      <button type="button" id="submit" style="margin-left: 90px; width: 100px; height: 30px; text-align:center;">Submit</button>
+    </form>
+  </div>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+    authDomain: "school-website-ddd48.firebaseapp.com",
+    databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+    projectId: "school-website-ddd48",
+    storageBucket: "school-website-ddd48.appspot.com",
+    messagingSenderId: "1007933429374",
+    appId: "1:1007933429374:web:14840411aff249e0786a2f",
+    measurementId: "G-55R6D0MHYM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+  import { getStorage, uploadBytes,ref as storageRef ,getDownloadURL} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  
+  const db = getDatabase();
+  const storage = getStorage();
+  
+  var name = document.querySelector("#name");
+  var department = document.querySelector("#department");
+  var experience = document.querySelector("#experience");
+  var designation = document.querySelector("#designation");
+  var photoInput = document.getElementById('photo');
+  var contact = document.querySelector("#contact");
+  var description = document.querySelector("#desc");
+  var dateofJoin = document.querySelector("#doj");
+  
+  
+  //the insertbutton
+  var insertBtn = document.querySelector("#submit");
+
+  async function insertData(event){
+    event.preventDefault();
+
+  const photo = photoInput.files[0];
+  const fileSize = photo.size;
+  const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+  if (fileSize > maxSizeInBytes) {
+    alert('The photo size exceeds the maximum limit of 1MB. Please choose a smaller photo.');
+    return;
+  }
+  
+  const photoRef = storageRef(storage, 'faculty/' + photo.name);
+  await uploadBytes(photoRef, photo);
+
+  const photoURL = await getDownloadURL(photoRef);
+
+  alert('no error after loading photo');
+  set(ref(db, "faculty/" + name.value +"/"), {
+    Name: name.value,
+    department: department.value,
+    experience: experience.value,
+    designation: designation.value,
+    contact: contact.value,
+    description: description.value,
+    dateofJoin: dateofJoin.value,
+    photo: photoURL
+  })
+    .then(() => {
+      var elem = document.getElementById("success");
+      elem.innerHTML=`<div class="success-message">&#10004;  Data added successfully</div>`;
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
+  }
+  insertBtn.addEventListener('click',insertData);
+
+</script>
+</body>
+</html>

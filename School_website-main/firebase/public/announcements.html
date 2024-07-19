@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements</title>
+    <style>
+        header {
+            text-align: center;
+            background-color: #3498db;
+            color: #fff;
+            padding: 20px;
+        }
+        .announcement {
+            border: 6px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            margin-left: 2%;
+            margin-right: 2%;
+            height: auto;
+        }
+
+        .pdf {
+            margin-left:84%;
+        }
+
+        .links a {
+            color: blue;
+            text-decoration: underline;
+        }
+        .pdfem {
+            margin-top: -50px;
+            margin-left: 84%;
+        }
+        .links a:hover {
+            color: blue;
+        }
+        .deadline{
+            margin-left:88%;
+        }
+        .curdate{
+            margin-left:88%; 
+        }
+        h3, .desc,.links{
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <img src="images/logo.jpeg" id="logo" alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+        </div>
+    </header>
+    <h2>Announcements</h2>
+    <div></div>
+    <div class="announcement" id="announcements" ></div>
+</body>
+<script type="module" >
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+    authDomain: "school-website-ddd48.firebaseapp.com",
+    databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+    projectId: "school-website-ddd48",
+    storageBucket: "school-website-ddd48.appspot.com",
+    messagingSenderId: "1007933429374",
+    appId: "1:1007933429374:web:14840411aff249e0786a2f",
+    measurementId: "G-55R6D0MHYM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getStorage, ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+    const db = getDatabase();
+    const storage = getStorage();
+
+    const starCountRef = ref(db, "Announcements/");
+
+    onValue(starCountRef, (snapshot) => {
+      const data = snapshot.val();
+      const announcementsContainer = document.getElementById("announcements");
+      announcementsContainer.innerHTML = ""; // Clear previous content
+
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          const announcement = data[key];
+
+          var deadline = announcement.DeadLine;
+          const currentDate = new Date();
+          const announcementDeadline = new Date(deadline);
+
+          const announcementElement = document.createElement("div");
+          announcementElement.classList.add("announcement");
+
+          if(currentDate < announcementDeadline || currentDate == announcementDeadline){
+            announcementElement.innerHTML = `
+                <p class="curdate" >Dated: ${announcement.CurDate}</p>
+                <h3>About: ${announcement.About}</h3>
+                <p class="desc" >Description: ${announcement.description}</p>
+          
+                ${announcement.pdfURL ? `<embed class="pdfem" src="${announcement.pdfURL}" width="200" height="200" />
+                    <a href="${announcement.pdfURL}" target="_blank" class="pdf" >Click here to download the PDF</a>` : ""}
+                <br>
+                ${announcement.Links ? `<div class="links"><p>Links: ${announcement.Links}</p></div>` : ""} 
+                <p class="deadline" >Deadline: ${announcement.DeadLine}</p>
+            `;
+
+          announcementsContainer.appendChild(announcementElement);
+          }
+          else{
+            const announcementKey = announcement.DeadLine;
+            const announcementRef = ref(db, 'Announcements/' + announcementKey);
+
+            remove(announcementRef)
+            .then(() => {
+              console.log("Announcement deleted successfully.");
+              console.log(announcement.About);
+            })
+            .catch((error) => {
+              console.error("Error deleting announcement:", error);
+            });
+          }
+        }
+      }
+    });
+</script>
+</html>

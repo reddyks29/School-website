@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Selector</title>
+  <style>
+    body {
+        display: block;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 60%;
+      margin-top: 10%;
+      margin-left: 20%;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #selected-image {
+        margin-top: 20px;
+      max-width: 90%;
+      max-height: auto;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .custom-file-upload {
+      display: flex;
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: #fff;
+      border-radius: 5px;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .custom-file-upload:hover {
+      background-color: #45a049;
+    }
+    #submit{
+        background-color: #4CAF50;
+        padding: 10px 20px;
+        border-radius: 5px;
+        
+        border: none;
+        color: #fff;
+    }
+    #submit:hover {
+        transition: background-color 0.3s ease;
+    }
+    header {
+      text-align: center;
+      background-color: #3498db;
+      color: #fff;
+      padding: 20px;
+    }
+    .success-message {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+  </style>
+</head>
+<body>
+    <header>
+        <div >
+            <img src="../images/logo.jpeg" id=logo alt="Logo image" style="margin-left: 10px; height: 50px; width: auto;vertical-align: middle; "/> <B style="vertical-align: middle; color: black; font-size: xx-large;" > GOVERNMENT HIGH SCHOOL MADNAHALLI CROSS</B>
+        </div>
+    </header>
+    <div class="container1" ></div>
+  <div class="container">
+    <div id="success"></div>
+    <h1>Image Selector</h1>
+    <label for="image-upload" class="custom-file-upload">
+      Select Image
+    </label>
+    <input id="image-upload" type="file" accept="image/*" onchange="displayImage(event)" required >
+    <img id="selected-image" src="#" alt="Selected Image"> <br>
+    <Button id="submit">Submit</Button>
+  </div>
+
+  <script>
+    function displayImage(event) {
+      var input = event.target;
+      var reader = new FileReader();
+
+      reader.onload = function () {
+        var image = document.getElementById("selected-image");
+        image.src = reader.result;
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  </script>
+  <script type="module" >
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyCwrvGsEJ5uAaZY82xsuQZCS5XfpDT9ft0",
+    authDomain: "school-website-ddd48.firebaseapp.com",
+    databaseURL: "https://school-website-ddd48-default-rtdb.firebaseio.com",
+    projectId: "school-website-ddd48",
+    storageBucket: "school-website-ddd48.appspot.com",
+    messagingSenderId: "1007933429374",
+    appId: "1:1007933429374:web:14840411aff249e0786a2f",
+    measurementId: "G-55R6D0MHYM"
+    };
+
+  // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    import {getDatabase, ref, get, set, child, update, remove} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getStorage, uploadBytes,ref as storageRef ,getDownloadURL} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  
+    const db = getDatabase();
+    const storage = getStorage();
+
+    var submitbtn = document.querySelector("#submit");
+
+    async function uploaddoc(e){
+        e.preventDefault();
+
+        var photoInput = document.getElementById('image-upload');
+        const photo = photoInput.files[0];
+        const fileSize = photo.size;
+        const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+        if (fileSize > maxSizeInBytes) {
+            alert('The photo size exceeds the maximum limit of 1MB. Please choose a smaller photo.');
+            return;
+        }
+  
+        const photoRef = storageRef(storage, 'Photo/' + photo.name);
+        await uploadBytes(photoRef, photo);
+        const photoURL = await getDownloadURL(photoRef);
+        alert('uploading photo');
+
+        set(ref(db, "Photo/"+photo.name[0,3]), {
+            Name: photo.name,
+            photo: photoURL
+         })
+        .then(() => {
+          var elem = document.getElementById("success");
+          elem.innerHTML=`<div class="success-message">&#10004;  Data added successfully</div>`;
+
+        document.querySelector(".container1").appendChild(successMessage);
+        })
+        .catch((error) => {
+            alert("Error: " + error.message);
+        });
+    }
+    submitbtn.addEventListener('click',uploaddoc);
+  </script>
+</body>
+</html>
